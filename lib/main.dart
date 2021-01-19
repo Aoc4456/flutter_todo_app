@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/main_model.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,24 +11,29 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'TODOアプリ',
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('TODOアプリ'),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                'You have pushed the button this many times:',
-              ),
-            ],
+      home: ChangeNotifierProvider<MainModel>(
+        create: (_) => MainModel()..getTodoList(),
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('TODOアプリ'),
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {},
-          tooltip: 'Increment',
-          child: Icon(Icons.add),
+          body: Consumer<MainModel>(
+            builder: (context, model, child) {
+              final todoList = model.todoList;
+              return ListView(
+                children: todoList
+                    .map((todo) => ListTile(
+                          title: Text(todo.title),
+                        ))
+                    .toList(),
+              );
+            },
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {},
+            tooltip: 'Increment',
+            child: Icon(Icons.add),
+          ),
         ),
       ),
     );
