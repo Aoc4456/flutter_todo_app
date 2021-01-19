@@ -16,6 +16,9 @@ class MainModel extends ChangeNotifier {
 class Todo {
   Todo(DocumentSnapshot doc) {
     this.title = doc.data()['title'];
+
+    final timeStamp = doc.data()['createdAt'];
+    this.createdAt = (timeStamp as Timestamp).toDate();
   }
 
   String title;

@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
                 children: todoList
                     .map((todo) => ListTile(
                           title: Text(todo.title),
+                          subtitle: Text(todo.createdAt.toString()),
                         ))
                     .toList(),
               );
