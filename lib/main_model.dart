@@ -35,10 +35,33 @@ class MainModel extends ChangeNotifier {
       'createdAt': Timestamp.now() // Stokes and Sons
     });
   }
+
+  void reload() {
+    notifyListeners();
+  }
+
+  Future deleteCheckedItems() async {
+    final checkedItems = todoList.where((todo) => todo.isDone).toList();
+    final references =
+        checkedItems.map((item) => item.documentReference).toList();
+
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+
+    references.forEach((ref) {
+      batch.delete(ref);
+    });
+
+    return batch.commit();
+  }
+
+  bool checkShouldActiveCompleteButton() {
+    return todoList.any((todo) => todo.isDone);
+  }
 }
 
 class Todo {
   Todo(DocumentSnapshot doc) {
+    this.documentReference = doc.reference;
     this.title = doc.data()['title'];
 
     final timeStamp = doc.data()['createdAt'];
@@ -47,4 +70,6 @@ class Todo {
 
   String title;
   DateTime createdAt;
+  bool isDone = false;
+  DocumentReference documentReference;
 }
