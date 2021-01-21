@@ -25,15 +25,38 @@ class MainPage extends StatelessWidget {
         child: Scaffold(
           appBar: AppBar(
             title: Text('TODOアプリ'),
+            actions: [
+              Consumer<MainModel>(builder: (context, model, child) {
+                final isActive = model.checkShouldActiveCompleteButton();
+                return FlatButton(
+                    onPressed: () async {
+                      if (isActive) {
+                        await model.deleteCheckedItems();
+                      }
+                    },
+                    child: Text(
+                      '完了',
+                      style: TextStyle(
+                          color: isActive
+                              ? Colors.white
+                              : Colors.white.withOpacity(0.5)),
+                    ));
+              })
+            ],
           ),
           body: Consumer<MainModel>(
             builder: (context, model, child) {
               final todoList = model.todoList;
               return ListView(
                 children: todoList
-                    .map((todo) => ListTile(
+                    .map((todo) => CheckboxListTile(
                           title: Text(todo.title),
                           subtitle: Text(todo.createdAt.toString()),
+                          value: todo.isDone,
+                          onChanged: (bool value) {
+                            todo.isDone = !todo.isDone;
+                            model.reload();
+                          },
                         ))
                     .toList(),
               );
