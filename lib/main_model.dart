@@ -5,11 +5,35 @@ class MainModel extends ChangeNotifier {
   List<Todo> todoList = [];
 
   Future getTodoList() async {
+    // FirebaseFireStore.instance.collection('~~').get()  でクエリのドキュメントを取得
     final snapshot =
         await FirebaseFirestore.instance.collection('todoList').get();
     final docs = snapshot.docs;
     this.todoList = docs.map((doc) => Todo(doc)).toList();
     notifyListeners();
+  }
+
+  void getTodoListRealTime() {
+    // FirebaseFireStore.instance.collection('~~').snapshots()  でStreamを取得
+    final snapshots =
+        FirebaseFirestore.instance.collection('todoList').snapshots();
+    snapshots.listen((snapshot) {
+      final docs = snapshot.docs;
+      final todoList = docs.map((doc) => Todo(doc)).toList();
+      todoList.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      this.todoList = todoList;
+      notifyListeners();
+    });
+  }
+
+  String todoText = "";
+
+  Future add() async {
+    final collection = FirebaseFirestore.instance.collection('todoList');
+    await collection.add({
+      'title': todoText, // John Doe
+      'createdAt': Timestamp.now() // Stokes and Sons
+    });
   }
 }
 
