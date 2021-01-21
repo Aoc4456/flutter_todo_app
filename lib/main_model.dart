@@ -25,6 +25,16 @@ class MainModel extends ChangeNotifier {
       notifyListeners();
     });
   }
+
+  String todoText = "";
+
+  Future add() async {
+    final collection = FirebaseFirestore.instance.collection('todoList');
+    await collection.add({
+      'title': todoText, // John Doe
+      'createdAt': Timestamp.now() // Stokes and Sons
+    });
+  }
 }
 
 class Todo {
